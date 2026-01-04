@@ -3,7 +3,7 @@ import { Bell, Menu } from "lucide-react";
 
 export default function Header() {
   return (
-    <header className="w-full border-b bg-white">
+    <header className="w-full bg-white">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
         
         {/* Left: Menu + Logo */}

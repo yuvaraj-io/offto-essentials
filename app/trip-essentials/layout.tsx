@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Lato } from "next/font/google";
-import Header from "@/components/common/Header";
-import "./globals.css";
-
+import Header from "@/components/customer-flow/common/Header";
+import Footer from "@/components/customer-flow/common/Footer";
 
 
 
@@ -24,13 +23,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${lato.variable} antialiased`}
-      >
-        {/* <Header /> */}
-        {children}
-      </body>
-    </html>
+    <>
+      <Header />
+      <div className="w-full border-b bg-white">
+        <div className="mx-auto max-w-7xl items-center justify-between px-6">
+            {children}
+        </div>
+       </div>
+       <Footer />
+    </>
+    
   );
 }
