@@ -64,26 +64,34 @@ export default function Dashboard() {
       {/* Metrics */}
       <div className="mt-14 grid grid-cols-4 gap-10">
         <MetricCircle
-          color="border-green-400"
           value="₹ 7,490"
           label="Today's Revenue"
+          percentage={75}
+          color="text-green-400"
         />
+
         <MetricCircle
-          color="border-blue-400"
           value="23456"
           label="Today's Bookings"
+          percentage={60}
+          color="text-blue-400"
         />
+
         <MetricCircle
-          color="border-yellow-400"
           value="4.5 / 5"
           label="Ratings"
+          percentage={90}
+          color="text-yellow-400"
         />
+
         <MetricCircle
-          color="border-red-500"
           value="2 days"
           label="Monthly pack expiring in 2 days"
+          percentage={30}
+          color="text-red-500"
         />
       </div>
+
 
       {/* CTA */}
       <div className="mt-12 flex justify-center">
@@ -109,18 +117,65 @@ function ActionCard({ title, icon }: { title: string; icon: string }) {
 function MetricCircle({
   value,
   label,
+  percentage,
   color,
 }: {
   value: string;
   label: string;
+  percentage: number; // still used for progress
   color: string;
 }) {
+  const radius = 70; // ⬅️ bigger circle
+  const strokeWidth = 12;
+  const size = 180; // svg size
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (percentage / 100) * circumference;
+
   return (
-    <div
-      className={`flex h-44 w-44 flex-col items-center justify-center rounded-full border-[10px] ${color}`}
-    >
-      <p className="text-lg font-semibold">{value}</p>
-      <p className="mt-1 text-center text-sm text-gray-600">{label}</p>
+    <div className="flex flex-col items-center">
+      <div className="relative h-[180px] w-[180px]">
+        <svg
+          width={size}
+          height={size}
+          className="-rotate-90"
+        >
+          {/* Background ring */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke="#E5E7EB"
+            strokeWidth={strokeWidth}
+            fill="none"
+          />
+
+          {/* Progress ring */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke="currentColor"
+            strokeWidth={strokeWidth}
+            fill="none"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            strokeLinecap="round"
+            className={color}
+          />
+        </svg>
+
+        {/* Center content */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
+          <p className="text-xl font-black font-lato leading-tight">
+            {value}
+          </p>
+         <p className="mt-2 w-[120px] text-center text-sm leading-snug text-gray-600 break-words">
+          {label}
+        </p>
+        </div>
+      </div>
     </div>
   );
 }
+
+
