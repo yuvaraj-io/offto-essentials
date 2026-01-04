@@ -9,7 +9,14 @@ export default function Header() {
         {/* Left: Menu + Logo */}
         <div className="flex items-center gap-4">
           <button className="p-2 hover:bg-gray-100 rounded-md">
-            <Menu className="h-5 w-5" />
+            {/* <Menu className="h-5 w-5" /> */}
+            <Image
+              src="/icons/Menu.png" // put logo inside public/images
+              alt="OFFTO"
+              width={36}
+              height={36}
+              priority
+            />
           </button>
 
           <div className="flex items-center gap-2">
@@ -50,12 +57,11 @@ function NavItem({
   active?: boolean;
 }) {
   return (
-    <div className="relative cursor-pointer text-sm font-medium text-black">
+    <div className="relative cursor-pointer text-lg font-medium text-black px-5">
       {label}
-
       {active && (
-        <span className="absolute -bottom-4 left-0 h-0.5 w-full rounded bg-blue-600" />
-      )}
+        <span className="absolute -bottom-2 left-0 h-0.5 w-full rounded bg-blue-600" />
+      )}    
     </div>
   );
 }

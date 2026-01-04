@@ -5,6 +5,14 @@ export default {
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontSize: {
+        xs: ["8px", "12px"], 
+        sm: ["12px", "16px"],
+        base: ["16px", "24px"],
+        lg: ["24px", "32px"],
+        xl: ["32px", "40px"],
+      },
+    },
   },
 };
