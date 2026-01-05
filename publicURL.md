@@ -15,13 +15,13 @@ Trip Essentials
             rate and reviews            -- DONE
             policies sold               -- DONE
             chain of business  ----- NA
-            apply for offtoverify       -- 
+            apply for offtoverify       -- DONE
             social page        ----- NA
-            bank details                --
-            upload business documents   --
-            training and resources      --
+            bank details                -- DONE
+            upload business documents   -- DONE
+            training and resources      -- DONE
             run an ad ---   NA          
-            settings                    
+            settings                    -- DONE         
        
         FLOW
         add and manage plans

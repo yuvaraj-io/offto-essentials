@@ -2,11 +2,24 @@
 
 import Image from "next/image";
 import { Bell } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { usePathname } from "next/navigation";
 import Sidebar from "../sidebar/Sidebar";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  const navigationMain = useMemo(() => {
+    if (!pathname) return "";
+
+    const segments = pathname.split("/").filter(Boolean);
+
+    // safety check
+    if (segments.length < 3) return "";
+
+    return `/${segments[0]}/${segments[1]}/${segments[2]}`;
+  }, [pathname]);
 
   return (
     <>
@@ -50,7 +63,11 @@ export default function Header() {
       </header>
 
       {/* Sidebar */}
-      <Sidebar open={open} onClose={() => setOpen(false)} navigationMain={`/business/trip-essentials/travel-insurance-and-protection`} />
+      <Sidebar
+        open={open}
+        onClose={() => setOpen(false)}
+        navigationMain={navigationMain}
+      />
     </>
   );
 }

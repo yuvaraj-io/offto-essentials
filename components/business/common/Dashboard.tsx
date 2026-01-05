@@ -1,11 +1,14 @@
 import Image from "next/image";
 
-export default function Dashboard() {
+export default function Dashboard(
+  {title}
+  :{title:string}
+) {
   return (
     <section className="w-full py-8 font-lato">
       {/* Title */}
       <h1 className="text-center text-xl font-extrabold mb-10">
-        Trip essentials & insurance
+        {title}
       </h1>
 
       {/* Top section */}
