@@ -5,21 +5,22 @@ Trip Essentials
 1. travel-insurance-and-protection/ --- Dashboard
             add and manage plans
             business-profile            -- DONE
-            calandar management         -- 
-            messages                    -- 
-            inclusion and exclusion     --
-            my revenue
-            contact details
+            my bookings                 -- DONE
+            calandar management         -- DONE
+            messages                    -- DONE
+            inclusion and exclusion     -- DONE
+            my revenue                  -- DONE
+            contact details             -- 
             enquiries
             rate and reviews
             policies sold
-            chain of business 
+            chain of business  ----- NA
             apply for offtoverify
             social page
             bank details
             upload business documents
             training and resources
-            run an ad
+            run an ad ---   NA
             settings
        
         FLOW
