@@ -10,18 +10,18 @@ Trip Essentials
             messages                    -- DONE
             inclusion and exclusion     -- DONE
             my revenue                  -- DONE
-            contact details             -- 
-            enquiries
-            rate and reviews
-            policies sold
+            contact details             -- Done
+            enquiries                   -- DONE
+            rate and reviews            -- DONE
+            policies sold               -- DONE
             chain of business  ----- NA
-            apply for offtoverify
-            social page
-            bank details
-            upload business documents
-            training and resources
-            run an ad ---   NA
-            settings
+            apply for offtoverify       -- 
+            social page        ----- NA
+            bank details                --
+            upload business documents   --
+            training and resources      --
+            run an ad ---   NA          
+            settings                    
        
         FLOW
         add and manage plans
