@@ -5,7 +5,7 @@ import Dashboard from "@/components/business/common/Dashboard";
 export default function Home() {
   return (
     <>
-      <Dashboard title="Trip essentials & insurance"/>
+      <Dashboard title="Event and celebraion partners"/>
     </>
   );
 }
