@@ -107,7 +107,7 @@ export default function Dashboard() {
 
 function ActionCard({ title, icon }: { title: string; icon: string }) {
   return (
-    <div className="flex items-center gap-4 rounded-xl bg-blue-700 px-6 py-4 text-white shadow">
+    <div className="flex items-center gap-4 rounded-xl bg-primary px-6 py-4 text-white shadow">
       <p className="text-sm font-medium leading-snug">{title}</p>
       <Image src={icon} alt="" width={32} height={32} />
     </div>

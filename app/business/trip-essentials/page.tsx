@@ -5,7 +5,7 @@ import Dashboard from "@/components/business/common/Dashboard";
 export default function Home() {
   return (
     <>
-      <Dashboard />
+     <h1>Catagories</h1>
     </>
   );
 }

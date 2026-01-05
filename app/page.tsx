@@ -1,6 +1,6 @@
-import Header from "@/components/common/Header";
+import Header from "@/components/business/common/Header";
 import { Button } from "@/components/ui/button";
-import AddressForm from "@/components/common/AddressForm";
+import AddressForm from "@/components/business/common/AddressForm";
 
 export default function Home() {
   return (

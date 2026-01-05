@@ -13,6 +13,9 @@ export default {
         lg: ["24px", "32px"],
         xl: ["32px", "40px"],
       },
+      colors: {
+        primary: "#0658A8",
+      },
     },
   },
 };

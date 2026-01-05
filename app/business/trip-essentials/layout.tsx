@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Lato } from "next/font/google";
-import Header from "@/components/common/Header";
+import Header from "@/components/business/common/Header";
 
 
 
@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <>
       <Header />
-      <div className="w-full border-b bg-white">
+      <div className="w-full  bg-white">
         <div className="mx-auto max-w-7xl items-center justify-between px-6">
           {children}
         </div>
