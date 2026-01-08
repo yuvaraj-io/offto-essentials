@@ -7,66 +7,86 @@ import { SimServiceFormData, SimPlan } from "./types";
 import PlanDetailsModal from "./PlanDetailsModal";
 
 interface Props {
-  onSubmit: (data: SimServiceFormData & { plans: SimPlan[] }) => Promise<void>;
+  onSubmit: (
+    data: SimServiceFormData & { plans: SimPlan[] }
+  ) => Promise<void>;
   submitLabel?: string;
+  initialData?: SimServiceFormData & { plans?: SimPlan[] };
 }
 
 export default function SimServiceForm({
   onSubmit,
-  submitLabel = "Save SIM Service"
+  submitLabel = "Save SIM Service",
+  initialData
 }: Props) {
-  /* ---------- SIM SERVICE FORM ---------- */
-  const [form, setForm] = useState<SimServiceFormData>({
-    name: "",
-    e_sim: false,
-    passport_required: false,
-    aadhar_required: false,
-    photo_required: false,
-    activation_time: "",
-    home_delivery_option: false,
-    pickup_latitude: null,
-    pickup_longitude: null,
-    sim_replace_availability: false
-  });
+  /* ---------- FORM STATE ---------- */
+  const [form, setForm] = useState<SimServiceFormData>(() => ({
+    name: initialData?.name ?? "",
+    e_sim: initialData?.e_sim ?? false,
+    passport_required:
+      initialData?.passport_required ?? false,
+    aadhar_required:
+      initialData?.aadhar_required ?? false,
+    photo_required:
+      initialData?.photo_required ?? false,
+    activation_time:
+      initialData?.activation_time ?? "",
+    home_delivery_option:
+      initialData?.home_delivery_option ?? false,
+    pickup_latitude:
+      initialData?.pickup_latitude ?? null,
+    pickup_longitude:
+      initialData?.pickup_longitude ?? null,
+    sim_replace_availability:
+      initialData?.sim_replace_availability ?? false
+  }));
 
   /* ---------- PLANS ---------- */
-  const [plans, setPlans] = useState<SimPlan[]>([]);
+  const [plans, setPlans] = useState<SimPlan[]>(
+    initialData?.plans ?? []
+  );
+
   const [showModal, setShowModal] = useState(false);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editingIndex, setEditingIndex] =
+    useState<number | null>(null);
 
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] =
+    useState<Record<string, string>>({});
 
   /* ---------- HELPERS ---------- */
-  const update = (key: keyof SimServiceFormData, value: any) => {
+  const update = (
+    key: keyof SimServiceFormData,
+    value: any
+  ) => {
     setForm((prev) => ({ ...prev, [key]: value }));
     setErrors((e) => ({ ...e, [key]: "" }));
   };
 
   const validate = () => {
-    const newErrors: Record<string, string> = {};
+    const e: Record<string, string> = {};
 
     if (!form.name.trim()) {
-      newErrors.name = "SIM provider name is required";
+      e.name = "SIM provider name is required";
     }
 
     if (!form.activation_time.trim()) {
-      newErrors.activation_time = "Activation time is required";
+      e.activation_time = "Activation time is required";
     }
 
     if (
       form.pickup_latitude === null ||
       form.pickup_longitude === null
     ) {
-      newErrors.pickup_location = "Pickup location is required";
+      e.pickup_location = "Pickup location is required";
     }
 
     if (plans.length === 0) {
-      newErrors.plans = "At least one plan is required";
+      e.plans = "At least one plan is required";
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
   const handleSubmit = async () => {
@@ -78,23 +98,26 @@ export default function SimServiceForm({
   };
 
   const handleDeletePlan = (index: number) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this plan?"
-    );
-    if (!confirmDelete) return;
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this plan?"
+      )
+    )
+      return;
 
-    setPlans((prev) => prev.filter((_, i) => i !== index));
+    setPlans((p) => p.filter((_, i) => i !== index));
   };
 
   /* ---------- RENDER ---------- */
   return (
     <div className="space-y-8 max-w-4xl">
-
       {/* ---------- PLAN MODAL ---------- */}
       {showModal && (
         <PlanDetailsModal
           initialPlan={
-            editingIndex !== null ? plans[editingIndex] : undefined
+            editingIndex !== null
+              ? plans[editingIndex]
+              : undefined
           }
           onSave={(plan: SimPlan) => {
             if (editingIndex === null) {
@@ -121,10 +144,14 @@ export default function SimServiceForm({
         <input
           className="w-full border-b outline-none py-1"
           value={form.name}
-          onChange={(e) => update("name", e.target.value)}
+          onChange={(e) =>
+            update("name", e.target.value)
+          }
         />
         {errors.name && (
-          <p className="text-sm text-red-500">{errors.name}</p>
+          <p className="text-sm text-red-500">
+            {errors.name}
+          </p>
         )}
       </div>
 
@@ -177,7 +204,9 @@ export default function SimServiceForm({
                 </button>
 
                 <button
-                  onClick={() => handleDeletePlan(index)}
+                  onClick={() =>
+                    handleDeletePlan(index)
+                  }
                   className="text-xs hover:text-red-200"
                 >
                   🗑
@@ -198,7 +227,9 @@ export default function SimServiceForm({
         </div>
 
         {errors.plans && (
-          <p className="text-sm text-red-500">{errors.plans}</p>
+          <p className="text-sm text-red-500">
+            {errors.plans}
+          </p>
         )}
       </div>
 

@@ -39,7 +39,7 @@ export default function Sidebar({
 
     {
       label: "Add & manage plans",
-      href: navigationMain + "/add-plans",
+      href: navigationMain + "/manage-plans",
       requiresSubscription: true
     },
     {
