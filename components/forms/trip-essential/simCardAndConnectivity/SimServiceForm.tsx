@@ -35,13 +35,43 @@ export default function SimServiceForm({
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   /* ---------- HELPERS ---------- */
   const update = (key: keyof SimServiceFormData, value: any) => {
     setForm((prev) => ({ ...prev, [key]: value }));
+    setErrors((e) => ({ ...e, [key]: "" }));
+  };
+
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!form.name.trim()) {
+      newErrors.name = "SIM provider name is required";
+    }
+
+    if (!form.activation_time.trim()) {
+      newErrors.activation_time = "Activation time is required";
+    }
+
+    if (
+      form.pickup_latitude === null ||
+      form.pickup_longitude === null
+    ) {
+      newErrors.pickup_location = "Pickup location is required";
+    }
+
+    if (plans.length === 0) {
+      newErrors.plans = "At least one plan is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async () => {
+    if (!validate()) return;
+
     setLoading(true);
     await onSubmit({ ...form, plans });
     setLoading(false);
@@ -74,6 +104,7 @@ export default function SimServiceForm({
               copy[editingIndex] = plan;
               setPlans(copy);
             }
+            setErrors((e) => ({ ...e, plans: "" }));
           }}
           onClose={() => {
             setShowModal(false);
@@ -85,19 +116,22 @@ export default function SimServiceForm({
       {/* ---------- SIM PROVIDER NAME ---------- */}
       <div>
         <label className="block text-sm font-medium mb-1">
-          SIM provider name
+          SIM provider name *
         </label>
         <input
           className="w-full border-b outline-none py-1"
           value={form.name}
           onChange={(e) => update("name", e.target.value)}
         />
+        {errors.name && (
+          <p className="text-sm text-red-500">{errors.name}</p>
+        )}
       </div>
 
       {/* ---------- SIM TYPE ---------- */}
       <div>
         <p className="text-sm font-medium mb-2">
-          SIM type (Physical SIM / eSIM)
+          SIM type *
         </p>
 
         <label className="mr-6">
@@ -120,96 +154,58 @@ export default function SimServiceForm({
       </div>
 
       {/* ---------- PLAN DETAILS ---------- */}
-      <div className="flex items-center gap-4 flex-wrap">
-        <p className="text-sm font-medium min-w-[90px]">
-          Plan details -
-        </p>
+      <div className="space-y-1">
+        <div className="flex items-center gap-4 flex-wrap">
+          <p className="text-sm font-medium min-w-[90px]">
+            Plan details *
+          </p>
 
-        {/* Existing plans */}
-        <div className="flex gap-2 flex-wrap">
-          {plans.map((plan, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-2 rounded bg-blue-500 px-3 py-1.5 text-sm text-white"
-            >
-              <button
-                onClick={() => {
-                  setEditingIndex(index);
-                  setShowModal(true);
-                }}
-                className="flex items-center gap-1 hover:underline"
+          <div className="flex gap-2 flex-wrap">
+            {plans.map((plan, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-2 rounded bg-blue-500 px-3 py-1.5 text-sm text-white"
               >
-                {plan.plan_name}
-                <span className="text-xs">✏️</span>
-              </button>
+                <button
+                  onClick={() => {
+                    setEditingIndex(index);
+                    setShowModal(true);
+                  }}
+                  className="hover:underline"
+                >
+                  {plan.plan_name}
+                </button>
 
-              <button
-                onClick={() => handleDeletePlan(index)}
-                className="text-xs hover:text-red-200"
-                title="Delete plan"
-              >
-                🗑
-              </button>
-            </div>
-          ))}
+                <button
+                  onClick={() => handleDeletePlan(index)}
+                  className="text-xs hover:text-red-200"
+                >
+                  🗑
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={() => {
+              setEditingIndex(null);
+              setShowModal(true);
+            }}
+            className="rounded border px-4 py-1.5 text-sm hover:bg-gray-50"
+          >
+            + Add New
+          </button>
         </div>
 
-        {/* Add new */}
-        <button
-          onClick={() => {
-            setEditingIndex(null);
-            setShowModal(true);
-          }}
-          className="rounded border px-4 py-1.5 text-sm hover:bg-gray-50"
-        >
-          + Add New
-        </button>
-      </div>
-
-      {/* ---------- REQUIRED DOCUMENTS ---------- */}
-      <div>
-        <p className="text-sm font-medium mb-2">
-          Required documents
-        </p>
-
-        <label className="mr-4">
-          <input
-            type="checkbox"
-            checked={form.passport_required}
-            onChange={(e) =>
-              update("passport_required", e.target.checked)
-            }
-          />{" "}
-          Passport
-        </label>
-
-        <label className="mr-4">
-          <input
-            type="checkbox"
-            checked={form.aadhar_required}
-            onChange={(e) =>
-              update("aadhar_required", e.target.checked)
-            }
-          />{" "}
-          Aadhaar
-        </label>
-
-        <label>
-          <input
-            type="checkbox"
-            checked={form.photo_required}
-            onChange={(e) =>
-              update("photo_required", e.target.checked)
-            }
-          />{" "}
-          Photo
-        </label>
+        {errors.plans && (
+          <p className="text-sm text-red-500">{errors.plans}</p>
+        )}
       </div>
 
       {/* ---------- ACTIVATION TIME ---------- */}
       <div>
         <label className="block text-sm font-medium mb-1">
-          Activation time
+          Activation time *
         </label>
         <input
           className="border-b outline-none py-1 w-48"
@@ -219,12 +215,17 @@ export default function SimServiceForm({
             update("activation_time", e.target.value)
           }
         />
+        {errors.activation_time && (
+          <p className="text-sm text-red-500">
+            {errors.activation_time}
+          </p>
+        )}
       </div>
 
       {/* ---------- PICKUP LOCATION ---------- */}
       <div>
         <p className="text-sm font-medium mb-2">
-          Pickup location
+          Pickup location *
         </p>
 
         <LocationPicker
@@ -235,64 +236,12 @@ export default function SimServiceForm({
             update("pickup_longitude", lng);
           }}
         />
-      </div>
 
-      {/* ---------- HOME DELIVERY ---------- */}
-      <div>
-        <p className="text-sm font-medium mb-2">
-          Home delivery option
-        </p>
-
-        <label className="mr-6">
-          <input
-            type="radio"
-            checked={form.home_delivery_option}
-            onChange={() =>
-              update("home_delivery_option", true)
-            }
-          />{" "}
-          Yes
-        </label>
-
-        <label>
-          <input
-            type="radio"
-            checked={!form.home_delivery_option}
-            onChange={() =>
-              update("home_delivery_option", false)
-            }
-          />{" "}
-          No
-        </label>
-      </div>
-
-      {/* ---------- SIM REPLACEMENT ---------- */}
-      <div>
-        <p className="text-sm font-medium mb-2">
-          SIM replacement availability
-        </p>
-
-        <label className="mr-6">
-          <input
-            type="radio"
-            checked={form.sim_replace_availability}
-            onChange={() =>
-              update("sim_replace_availability", true)
-            }
-          />{" "}
-          Yes
-        </label>
-
-        <label>
-          <input
-            type="radio"
-            checked={!form.sim_replace_availability}
-            onChange={() =>
-              update("sim_replace_availability", false)
-            }
-          />{" "}
-          No
-        </label>
+        {errors.pickup_location && (
+          <p className="text-sm text-red-500">
+            {errors.pickup_location}
+          </p>
+        )}
       </div>
 
       {/* ---------- SUBMIT ---------- */}
