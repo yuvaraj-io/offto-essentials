@@ -6,16 +6,15 @@ import { useBusiness } from "@/context/BusinessContext";
 
 export default function SubscriptionPage() {
   const router = useRouter();
-  const { businessProfileId } = useBusiness();
+  const { activeBusiness, setActiveBusiness } = useBusiness();
 
   const handleSubscribe = async () => {
-    if (!businessProfileId) return;
-
+    if (!activeBusiness) return;
     const res = await fetch("/api/subscriptions/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        business_profile_id: businessProfileId
+        business_profile_id: activeBusiness.id
       })
     });
 
@@ -24,7 +23,13 @@ export default function SubscriptionPage() {
       return;
     }
 
-    // After successful subscription
+    // ✅ Update context immediately
+    setActiveBusiness({
+      ...activeBusiness,
+      isSubscribed: true
+    });
+
+    // ✅ Redirect back to dashboard
     router.push(
       "/business/trip-essentials/connectivity-and-sim-services"
     );
@@ -48,7 +53,11 @@ export default function SubscriptionPage() {
           </p>
         </div>
 
-        <Button className="w-full" onClick={handleSubscribe}>
+        <Button
+          className="w-full"
+          onClick={handleSubscribe}
+          disabled={!activeBusiness}
+        >
           Subscribe Now
         </Button>
       </div>

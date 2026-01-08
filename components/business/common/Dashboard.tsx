@@ -4,7 +4,7 @@ import Image from "next/image";
 
 interface BusinessInfo {
   name: string;
-  address: string;
+  address: string | null;
   phone_number: string;
   email: string;
 }

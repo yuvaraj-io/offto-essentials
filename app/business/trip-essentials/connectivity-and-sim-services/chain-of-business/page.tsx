@@ -9,15 +9,17 @@ import { Button } from "@/components/ui/button";
 interface Business {
   id: string;
   name: string;
-  address: string;
+  address: string | null;
+  phone_number: string;
 }
 
 export default function BusinessChainPage() {
   const router = useRouter();
-  const { setBusinessProfileId } = useBusiness();
+  const { setActiveBusiness } = useBusiness();
 
   const [businesses, setBusinesses] = useState<Business[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedBusiness, setSelectedBusiness] =
+    useState<Business | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -41,15 +43,32 @@ export default function BusinessChainPage() {
     fetchBusinesses();
   }, []);
 
-  const handleMakeActive = () => {
-    if (!selectedId) return;
+  const handleMakeActive = async () => {
+    if (!selectedBusiness) return;
 
-    debugger
-    setBusinessProfileId(selectedId);
+    try {
+      // 1️⃣ Fetch subscription status
+      const subRes = await fetch(
+        `/api/subscriptions/get/${selectedBusiness.id}`
+      );
+      const subData = await subRes.json();
 
-    router.push(
-      "/business/trip-essentials/connectivity-and-sim-services"
-    );
+      // 2️⃣ Hydrate context properly
+      setActiveBusiness({
+        id: selectedBusiness.id,
+        name: selectedBusiness.name,
+        phone_number: selectedBusiness.phone_number,
+        isSubscribed: Boolean(subData?.is_subscribed),
+        subscriptionEndsAt: subData?.subscription?.to_date ?? null
+      });
+
+      // 3️⃣ Navigate
+      router.push(
+        "/business/trip-essentials/connectivity-and-sim-services"
+      );
+    } catch (err) {
+      console.error("[MakeActive]", err);
+    }
   };
 
   if (loading) {
@@ -71,10 +90,10 @@ export default function BusinessChainPage() {
         {businesses.map((biz) => (
           <div
             key={biz.id}
-            onClick={() => setSelectedId(biz.id)}
+            onClick={() => setSelectedBusiness(biz)}
             className={`cursor-pointer rounded-lg border p-4 transition
               ${
-                selectedId === biz.id
+                selectedBusiness?.id === biz.id
                   ? "border-primary ring-2 ring-primary"
                   : "border-gray-200"
               }`}
@@ -90,7 +109,7 @@ export default function BusinessChainPage() {
               <div>
                 <p className="font-medium">{biz.name}</p>
                 <p className="text-sm text-gray-500">
-                  {biz.address}
+                  {biz.address ?? "—"}
                 </p>
               </div>
             </div>
@@ -106,14 +125,16 @@ export default function BusinessChainPage() {
           }
           className="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-6 text-gray-500 hover:border-primary hover:text-primary"
         >
-          <span className="text-lg font-medium">+ Add new business</span>
+          <span className="text-lg font-medium">
+            + Add new business
+          </span>
         </div>
       </div>
 
       {/* Make Active Button */}
       <div className="flex justify-end">
         <Button
-          disabled={!selectedId}
+          disabled={!selectedBusiness}
           onClick={handleMakeActive}
         >
           Make Active

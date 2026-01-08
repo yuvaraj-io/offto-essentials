@@ -16,7 +16,7 @@ export async function GET(req: Request) {
 
     if (!business_profile_id) {
       return NextResponse.json(
-        { message: "business_profile_id required" },
+        { success: false, message: "business_profile_id required" },
         { status: 400 }
       );
     }
@@ -29,9 +29,15 @@ export async function GET(req: Request) {
       [business_profile_id]
     );
 
-    return NextResponse.json({ success: true, data: rows });
+    return NextResponse.json({
+      success: true,
+      data: rows
+    });
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
+    console.error("[SUBSCRIPTION_LIST]", err);
+    return NextResponse.json(
+      { success: false, message: "Server error" },
+      { status: 500 }
+    );
   }
 }

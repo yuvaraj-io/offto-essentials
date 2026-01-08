@@ -9,70 +9,88 @@ import { useBusiness } from "@/context/BusinessContext";
 interface BusinessData {
   id: string;
   name: string;
-  address: string;
+  address: string | null;
   phone_number: string;
   email: string;
 }
 
 export default function ConnectivitySimPage() {
   const router = useRouter();
-
-  const { businessProfileId, setBusinessProfileId } = useBusiness();
+  const { activeBusiness, setActiveBusiness } = useBusiness();
 
   const [loading, setLoading] = useState(true);
   const [business, setBusiness] = useState<BusinessData | null>(null);
+  const [hasAnyBusiness, setHasAnyBusiness] = useState(true);
 
   useEffect(() => {
-    const bootstrapBusiness = async () => {
+    const bootstrap = async () => {
       try {
-        // 1️⃣ If active business already exists → fetch ONLY that
-        if (businessProfileId) {
-          const res = await fetch(
-            `/api/essential-business/connectivity-sim/profile/detail?id=${businessProfileId}`
+        let businessId = activeBusiness?.id;
+
+        // 1️⃣ No active business → fetch list
+        if (!businessId) {
+          const listRes = await fetch(
+            "/api/essential-business/connectivity-sim/profile/list"
           );
+          const listData = await listRes.json();
 
-          const data = await res.json();
-
-          if (res.ok) {
-            setBusiness(data.data);
+          if (!listRes.ok || !listData.data?.length) {
+            setHasAnyBusiness(false);
+            return;
           }
 
-          setLoading(false);
+          businessId = listData.data[0].id;
+        }
+
+        // 2️⃣ Fetch business detail
+        const detailRes = await fetch(
+          `/api/essential-business/connectivity-sim/profile/detail?id=${businessId}`
+        );
+        const detailData = await detailRes.json();
+
+        if (!detailRes.ok || !detailData.data) {
+          setHasAnyBusiness(false);
           return;
         }
 
-        // 2️⃣ Else → fetch list
-        const res = await fetch(
-          "/api/essential-business/connectivity-sim/profile/list"
+        const fullBusiness: BusinessData = detailData.data;
+        setBusiness(fullBusiness);
+
+        // 3️⃣ Fetch subscription (can be null – OK)
+        const subRes = await fetch(
+          `/api/subscriptions/get/${businessId}`
         );
-
-        const data = await res.json();
-
-        if (res.ok && data.data?.length > 0) {
-          const firstBusiness = data.data[0];
-
-          // set active business
-          setBusinessProfileId(firstBusiness.id);
-
-          // use first business data directly
-          setBusiness(firstBusiness);
-        }
+        const subData = await subRes.json();
+        debugger
+        // 4️⃣ Sync context ONLY if business exists
+        setActiveBusiness({
+          id: fullBusiness.id,
+          name: fullBusiness.name,
+          phone_number: fullBusiness.phone_number,
+          isSubscribed: Boolean(subData?.is_subscribed),
+          subscriptionEndsAt: subData?.subscription?.to_date ?? null
+        });
       } catch (err) {
         console.error("[ConnectivitySimPage]", err);
+        setHasAnyBusiness(false);
       } finally {
         setLoading(false);
       }
     };
 
-    bootstrapBusiness();
-  }, [businessProfileId, setBusinessProfileId]);
+    bootstrap();
+    // run once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /* ---------- STATES ---------- */
 
   if (loading) {
     return <p className="p-6">Loading...</p>;
   }
 
-  // ❌ No business at all → CTA
-  if (!business) {
+  // ❌ No business in DB
+  if (!hasAnyBusiness) {
     return (
       <div className="p-6">
         <h2 className="text-xl font-semibold mb-2">
@@ -80,8 +98,7 @@ export default function ConnectivitySimPage() {
         </h2>
 
         <p className="text-gray-600 mb-4">
-          Please create your Connectivity and SIM services profile
-          to continue.
+          You don’t have any business profile yet.
         </p>
 
         <Button
@@ -97,11 +114,24 @@ export default function ConnectivitySimPage() {
     );
   }
 
-  // ✅ Business exists → render dashboard with DATA (no fetching inside)
+  // ❌ Defensive (should never happen, but safe)
+  if (!business) {
+    return (
+      <p className="p-6 text-gray-500">
+        Unable to load business details.
+      </p>
+    );
+  }else{
+
+     /* ✅ Business exists */
   return (
     <Dashboard
       title="Connectivity and SIM Services"
       business={business}
     />
   );
+
+  }
+
+ 
 }

@@ -1,24 +1,15 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { getBusinessFromRequest } from "@/lib/auth/business-auth";
 import { v4 as uuidv4 } from "uuid";
 
 export async function POST(req: Request) {
   try {
-    const { business_login_id } = getBusinessFromRequest(req);
     const { business_profile_id } = await req.json();
 
-    // ownership check
-    const [owns]: any = await db.query(
-      `SELECT id FROM connectivity_sim_business_profile
-       WHERE id = ? AND business_login_id = ?`,
-      [business_profile_id, business_login_id]
-    );
-
-    if (owns.length === 0) {
+    if (!business_profile_id) {
       return NextResponse.json(
-        { message: "Unauthorized" },
-        { status: 401 }
+        { message: "business_profile_id is required" },
+        { status: 400 }
       );
     }
 

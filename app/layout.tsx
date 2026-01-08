@@ -28,7 +28,7 @@ export default function RootLayout({
       <body
         className={`${lato.variable} antialiased`}
       >
-        {/* <Header /> */}
+
         {children}
       </body>
     </html>

@@ -1,6 +1,7 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { getBusinessFromRequest } from "@/lib/auth/business-auth";
 import { RowDataPacket } from "mysql2";
 
 interface SubscriptionRow extends RowDataPacket {
@@ -10,38 +11,26 @@ interface SubscriptionRow extends RowDataPacket {
 
 export async function GET(
   _req: Request,
-  { params }: { params: { businessProfileId: string } }
+  context: { params: Promise<{ businessProfileId: string }> }
 ) {
   try {
-    const { business_login_id } = getBusinessFromRequest(_req);
-
-    // verify ownership
-    const [ownership]: any = await db.query(
-      `SELECT id FROM connectivity_sim_business_profile
-       WHERE id = ? AND business_login_id = ?`,
-      [params.businessProfileId, business_login_id]
-    );
-
-    if (ownership.length === 0) {
-      return NextResponse.json(
-        { message: "Unauthorized" },
-        { status: 401 }
-      );
-    }
+    // ✅ unwrap params (THIS IS THE FIX)
+    const { businessProfileId } = await context.params;
 
     const [rows] = await db.query<SubscriptionRow[]>(
       `SELECT from_date, to_date
        FROM subscriptions
        WHERE business_profile_id = ?
-         AND CURDATE() BETWEEN from_date AND to_date
+         AND CURDATE() >= from_date
+         AND CURDATE() < DATE_ADD(to_date, INTERVAL 1 DAY)
        LIMIT 1`,
-      [params.businessProfileId]
+      [businessProfileId]
     );
 
     return NextResponse.json({
       success: true,
       is_subscribed: rows.length > 0,
-      subscription: rows[0] || null
+      subscription: rows[0] ?? null
     });
   } catch (err) {
     console.error("[SUBSCRIPTION_GET]", err);

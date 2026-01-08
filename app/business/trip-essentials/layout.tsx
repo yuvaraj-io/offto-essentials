@@ -14,7 +14,6 @@ export default function RootLayout({
 }>) {
   return (
     <>
-      <Header />
       <div className="w-full  bg-white">
         <div className="mx-auto max-w-7xl items-center justify-between px-6">
           {children}

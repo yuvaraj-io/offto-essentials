@@ -6,7 +6,6 @@ export default function Home() {
 
   return (
     <>
-      <Header />
 
       <main className="container mx-auto px-4 py-20 text-center">
         <h1 className="text-4xl font-bold tracking-tight">
