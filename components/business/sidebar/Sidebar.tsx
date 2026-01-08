@@ -39,7 +39,7 @@ export default function Sidebar({
 
     {
       label: "Add & manage plans",
-      href: "#",
+      href: navigationMain + "/add-plans",
       requiresSubscription: true
     },
     {
@@ -150,10 +150,15 @@ export default function Sidebar({
           <p className="text-xs text-gray-500">
             {activeBusiness?.phone_number ?? ""}
           </p>
-
-          <button className="mt-2 text-sm border rounded px-3 py-1">
-            Switch to
-          </button>
+            <Link
+              href={navigationMain + "/chain-of-business"}
+              className="block px-4 py-3 rounded hover:bg-gray-100"
+              >
+              <button className="mt-2 text-sm border rounded px-3 py-1">
+              Switch to
+            </button>
+            </Link>
+          
 
           <div className="flex items-center gap-2 mt-3">
             <span
