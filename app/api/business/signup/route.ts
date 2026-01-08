@@ -6,17 +6,12 @@ interface BusinessSignupRequest {
   phone_no: string;
   email: string;
   password: string;
-  business_name?: string;
 }
 
 export async function POST(req: Request) {
   try {
-    const {
-      phone_no,
-      email,
-      password,
-      business_name
-    }: BusinessSignupRequest = await req.json();
+    const { phone_no, email, password }: BusinessSignupRequest =
+      await req.json();
 
     if (!phone_no || !email || !password) {
       return NextResponse.json(
@@ -41,9 +36,9 @@ export async function POST(req: Request) {
 
     await db.query(
       `INSERT INTO business_login
-       (id, phone_no, email, password_hash, business_name)
-       VALUES (UUID(), ?, ?, ?, ?)`,
-      [phone_no, email, passwordHash, business_name || null]
+       (id, phone_no, email, password_hash)
+       VALUES (UUID(), ?, ?, ?)`,
+      [phone_no, email, passwordHash]
     );
 
     return NextResponse.json({

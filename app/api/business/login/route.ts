@@ -11,12 +11,10 @@ interface BusinessLoginRequest {
 }
 
 interface BusinessRow extends RowDataPacket {
-  id: string;
+  id: string;          // UUID
   phone_no: string;
   email: string;
   password_hash: string;
-  is_active: number;
-  is_verified: number;
 }
 
 export async function POST(req: Request) {
@@ -32,9 +30,9 @@ export async function POST(req: Request) {
     }
 
     const [rows] = await db.query<BusinessRow[]>(
-      `SELECT id, phone_no, email, password_hash, is_active, is_verified
+      `SELECT id, phone_no, email, password_hash
        FROM business_login
-       WHERE (phone_no = ? OR email = ?) AND is_active = 1`,
+       WHERE phone_no = ? OR email = ?`,
       [phone_no || null, email || null]
     );
 
@@ -74,8 +72,7 @@ export async function POST(req: Request) {
       business: {
         id: business.id,
         phone_no: business.phone_no,
-        email: business.email,
-        is_verified: business.is_verified
+        email: business.email
       }
     });
   } catch (err) {
