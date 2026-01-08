@@ -9,9 +9,11 @@ interface Props {
   initialData?: BusinessProfileFormData;
   onSubmit: (data: BusinessProfileFormData) => Promise<void>;
   submitLabel?: string;
+  disableName?: boolean;
 }
 
 export default function BusinessProfileForm({
+  disableName,
   initialData,
   onSubmit,
   submitLabel = "Save"
@@ -69,6 +71,7 @@ export default function BusinessProfileForm({
           value={form.name}
           onChange={handleChange}
           placeholder="Business Name"
+          disabled={disableName}
           className="w-full border rounded p-3"
         />
         {errors.name && (

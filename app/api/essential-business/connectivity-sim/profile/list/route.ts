@@ -67,7 +67,7 @@ export async function GET(req: Request) {
 
     // 4️⃣ Query DB
     const [rows] = await db.query<ProfileRow[]>(
-      `SELECT id, name, email, phone_number, is_verified, profile_pic
+      `SELECT *
        FROM connectivity_sim_business_profile
        WHERE business_login_id = ?`,
       [business_login_id]
