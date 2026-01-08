@@ -9,34 +9,39 @@ interface SignupRequest {
 
 export async function POST(req: Request) {
   try {
-    const body: SignupRequest = await req.json();
-    const { phone_no, password } = body;
+    const { phone_no, password }: SignupRequest = await req.json();
 
     if (!phone_no || !password) {
       return NextResponse.json({ message: "Missing fields" }, { status: 400 });
     }
 
-    const [existing] = await db.query<any[]>(
+    const [existing]: any = await db.query(
       "SELECT id FROM users_login WHERE phone_no = ?",
       [phone_no]
     );
 
     if (existing.length > 0) {
-      return NextResponse.json({ message: "User already exists" }, { status: 409 });
+      return NextResponse.json(
+        { message: "User already exists" },
+        { status: 409 }
+      );
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
 
     await db.query(
-      "INSERT INTO users_login (phone_no, password_hash) VALUES (?, ?)",
+      `INSERT INTO users_login 
+       (id, phone_no, password_hash) 
+       VALUES (UUID(), ?, ?)`,
       [phone_no, passwordHash]
     );
 
     return NextResponse.json({
       success: true,
-      message: "Signup successful"
+      message: "User registered successfully"
     });
-  } catch (error) {
+  } catch (err) {
+    console.error(err);
     return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
