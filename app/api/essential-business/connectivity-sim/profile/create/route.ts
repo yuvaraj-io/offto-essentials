@@ -26,19 +26,6 @@ export async function POST(req: Request) {
       );
     }
 
-    const [existing]: any = await db.query(
-      `SELECT id FROM connectivity_sim_business_profile
-       WHERE business_login_id = ?`,
-      [business_login_id]
-    );
-
-    if (existing.length > 0) {
-      return NextResponse.json(
-        { message: "Business profile already exists" },
-        { status: 409 }
-      );
-    }
-
     await db.query(
       `INSERT INTO connectivity_sim_business_profile (
         id,

@@ -1,9 +1,23 @@
+"use client";
+
 import Image from "next/image";
 
-export default function Dashboard(
-  {title}
-  :{title:string}
-) {
+interface BusinessInfo {
+  name: string;
+  address: string;
+  phone_number: string;
+  email: string;
+}
+
+interface DashboardProps {
+  title: string;
+  business: BusinessInfo;
+}
+
+export default function Dashboard({
+  title,
+  business
+}: DashboardProps) {
   return (
     <section className="w-full py-8 font-lato">
       {/* Title */}
@@ -19,13 +33,13 @@ export default function Dashboard(
           <div className="relative">
             <Image
               src="/icons/Company.png"
-              alt="Holiday Company"
+              alt="Company Logo"
               width={90}
               height={90}
               className="rounded-full"
             />
 
-            <button className="mt-3 rounded-full bg-blue-500 px-4 py-1 text-sm text-white">
+            <button className="mt-3 rounded-full bg-blue-500 px-4 py-1 text-sm text-white relative">
               6 Boards
               <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-400 border-2 border-white" />
             </button>
@@ -33,38 +47,41 @@ export default function Dashboard(
 
           {/* Info */}
           <div>
-            <h2 className="text-lg font-bold mb-1">AGT Guides</h2>
+            <h2 className="text-lg font-bold mb-1">
+              {business.name}
+            </h2>
 
-            <p className="text-sm text-gray-700">
-              123 Maple Lane,<br />
-              Springfield, Anywhere<br />
-              12345
+            <p className="text-sm text-gray-700 whitespace-pre-line">
+              {business.address || "—"}
             </p>
 
-            <p className="mt-2 text-sm">911234565</p>
-            <p className="text-sm">www.royal@gmail.com</p>
+            <p className="mt-2 text-sm">
+              {business.phone_number || "—"}
+            </p>
 
-         
+            <p className="text-sm">
+              {business.email || "—"}
+            </p>
           </div>
         </div>
 
         {/* Divider */}
         <div className="h-24 w-px bg-gray-300" />
 
-        {/* Followers */}
+        {/* Followers (UNCHANGED) */}
         <div className="flex flex-col justify-center">
           <p className="text-sm text-gray-500">Followers</p>
           <p className="text-lg font-semibold">1,235</p>
         </div>
 
-        {/* Actions */}
+        {/* Actions (UNCHANGED) */}
         <div className="flex gap-6">
           <ActionCard title="Add & manage plans" icon="/icons/Approve.png" />
           <ActionCard title="Direct bookings" icon="/icons/ticket.png" />
         </div>
       </div>
 
-      {/* Metrics */}
+      {/* Metrics (UNCHANGED) */}
       <div className="mt-14 grid grid-cols-4 gap-10">
         <MetricCircle
           value="₹ 7,490"
@@ -95,7 +112,6 @@ export default function Dashboard(
         />
       </div>
 
-
       {/* CTA */}
       <div className="mt-12 flex justify-center">
         <button className="rounded-lg border px-6 py-2 text-sm font-medium">
@@ -106,12 +122,14 @@ export default function Dashboard(
   );
 }
 
-/* ---------- Helper Components (internal) ---------- */
+/* ---------- Helper Components (UNCHANGED) ---------- */
 
 function ActionCard({ title, icon }: { title: string; icon: string }) {
   return (
     <div className="flex items-center gap-4 rounded-xl bg-primary px-6 py-4 text-white shadow">
-      <p className="text-sm font-medium leading-snug">{title}</p>
+      <p className="text-sm font-medium leading-snug">
+        {title}
+      </p>
       <Image src={icon} alt="" width={32} height={32} />
     </div>
   );
@@ -121,28 +139,23 @@ function MetricCircle({
   value,
   label,
   percentage,
-  color,
+  color
 }: {
   value: string;
   label: string;
-  percentage: number; // still used for progress
+  percentage: number;
   color: string;
 }) {
-  const radius = 70; // ⬅️ bigger circle
+  const radius = 70;
   const strokeWidth = 12;
-  const size = 180; // svg size
+  const size = 180;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (percentage / 100) * circumference;
 
   return (
     <div className="flex flex-col items-center">
       <div className="relative h-[180px] w-[180px]">
-        <svg
-          width={size}
-          height={size}
-          className="-rotate-90"
-        >
-          {/* Background ring */}
+        <svg width={size} height={size} className="-rotate-90">
           <circle
             cx={size / 2}
             cy={size / 2}
@@ -152,7 +165,6 @@ function MetricCircle({
             fill="none"
           />
 
-          {/* Progress ring */}
           <circle
             cx={size / 2}
             cy={size / 2}
@@ -167,18 +179,15 @@ function MetricCircle({
           />
         </svg>
 
-        {/* Center content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
           <p className="text-xl font-black font-lato leading-tight">
             {value}
           </p>
-         <p className="mt-2 w-[120px] text-center text-sm leading-snug text-gray-600 break-words">
-          {label}
-        </p>
+          <p className="mt-2 w-[120px] text-center text-sm leading-snug text-gray-600 break-words">
+            {label}
+          </p>
         </div>
       </div>
     </div>
   );
 }
-
-

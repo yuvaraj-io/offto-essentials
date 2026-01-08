@@ -60,6 +60,7 @@ export default function Sidebar({ open, onClose, navigationMain }: SidebarProps)
         <nav className="flex-1 overflow-y-auto p-2 text-sm">
           <SidebarItem label="Add & manage plans" href="#" />
           <SidebarItem label="Business profiles" href={navigationMain + "/business-profile"} />
+          <SidebarItem label="Chain of Business" href={navigationMain + "/chain-of-business"} />
           <SidebarItem label="My bookings" href={navigationMain + "/my-bookings"} />
           <SidebarItem label="Calendar management" href={navigationMain + "/calendar-management"} />
           <SidebarItem label="Messages" href={navigationMain + "/messages"}/>
