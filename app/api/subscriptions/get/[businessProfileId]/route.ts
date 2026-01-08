@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getBusinessFromRequest } from "@/lib/auth/business-auth";
 import { RowDataPacket } from "mysql2";
 
 interface SubscriptionRow extends RowDataPacket {
@@ -12,6 +13,22 @@ export async function GET(
   { params }: { params: { businessProfileId: string } }
 ) {
   try {
+    const { business_login_id } = getBusinessFromRequest(_req);
+
+    // verify ownership
+    const [ownership]: any = await db.query(
+      `SELECT id FROM connectivity_sim_business_profile
+       WHERE id = ? AND business_login_id = ?`,
+      [params.businessProfileId, business_login_id]
+    );
+
+    if (ownership.length === 0) {
+      return NextResponse.json(
+        { message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
     const [rows] = await db.query<SubscriptionRow[]>(
       `SELECT from_date, to_date
        FROM subscriptions
@@ -27,7 +44,10 @@ export async function GET(
       subscription: rows[0] || null
     });
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
+    console.error("[SUBSCRIPTION_GET]", err);
+    return NextResponse.json(
+      { message: "Server error" },
+      { status: 500 }
+    );
   }
 }
