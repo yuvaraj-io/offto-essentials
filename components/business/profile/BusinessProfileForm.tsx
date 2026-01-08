@@ -29,18 +29,28 @@ export default function BusinessProfileForm({
     ...initialData
   });
 
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof BusinessProfileFormData, string>>
+  >({});
+
   const [loading, setLoading] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    setForm((prev) => ({ ...prev, [name]: value }));
+
+    if (errors[name as keyof BusinessProfileFormData]) {
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
+    }
   };
 
   const handleSubmit = async () => {
     const validationErrors = validateBusinessProfile(form);
-    if (Object.keys(validationErrors).length) {
+
+    if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
@@ -51,29 +61,113 @@ export default function BusinessProfileForm({
   };
 
   return (
-    <div className="space-y-6">
-      <input name="name" value={form.name} onChange={handleChange} placeholder="Business Name" />
-      <input name="email" value={form.email} onChange={handleChange} placeholder="Email" />
-      <input name="phone_number" value={form.phone_number} onChange={handleChange} placeholder="Phone Number" />
+    <div className="space-y-6 pt-10">
+      {/* Name */}
+      <div>
+        <input
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          placeholder="Business Name"
+          className="w-full border rounded p-3"
+        />
+        {errors.name && (
+          <p className="text-sm text-red-600 mt-1">
+            {errors.name}
+          </p>
+        )}
+      </div>
 
-      <textarea name="about" value={form.about} onChange={handleChange} placeholder="About" />
+      {/* Email */}
+      <div>
+        <input
+          name="email"
+          value={form.email}
+          onChange={handleChange}
+          placeholder="Email"
+          className="w-full border rounded p-3"
+        />
+        {errors.email && (
+          <p className="text-sm text-red-600 mt-1">
+            {errors.email}
+          </p>
+        )}
+      </div>
 
-      <input name="address" value={form.address} onChange={handleChange} placeholder="Address" />
-      <input name="landmark" value={form.landmark} onChange={handleChange} placeholder="Landmark" />
-      <input name="pincode" value={form.pincode} onChange={handleChange} placeholder="Pincode" />
+      {/* Phone */}
+      <div>
+        <input
+          name="phone_number"
+          value={form.phone_number}
+          onChange={handleChange}
+          placeholder="Phone Number"
+          className="w-full border rounded p-3"
+        />
+        {errors.phone_number && (
+          <p className="text-sm text-red-600 mt-1">
+            {errors.phone_number}
+          </p>
+        )}
+      </div>
+
+      {/* About */}
+      <textarea
+        name="about"
+        value={form.about}
+        onChange={handleChange}
+        placeholder="About"
+        className="w-full border rounded p-3"
+      />
+
+      {/* Address */}
+      <input
+        name="address"
+        value={form.address}
+        onChange={handleChange}
+        placeholder="Address"
+        className="w-full border rounded p-3"
+      />
+
+      <input
+        name="landmark"
+        value={form.landmark}
+        onChange={handleChange}
+        placeholder="Landmark"
+        className="w-full border rounded p-3"
+      />
+
+      <div>
+        <input
+          name="pincode"
+          value={form.pincode}
+          onChange={handleChange}
+          placeholder="Pincode"
+          className="w-full border rounded p-3"
+        />
+        {errors.pincode && (
+          <p className="text-sm text-red-600 mt-1">
+            {errors.pincode}
+          </p>
+        )}
+      </div>
 
       <LocationPicker
         latitude={form.latitude ?? null}
         longitude={form.longitude ?? null}
         onChange={(lat, lng) =>
-          setForm({ ...form, latitude: lat, longitude: lng })
+          setForm((prev) => ({
+            ...prev,
+            latitude: lat,
+            longitude: lng
+          }))
         }
       />
 
       <button
+        suppressHydrationWarning
         onClick={handleSubmit}
         disabled={loading}
-        className="w-full bg-black text-white py-3 rounded"
+        className="w-full bg-primary text-white py-3 rounded"
       >
         {loading ? "Saving..." : submitLabel}
       </button>
