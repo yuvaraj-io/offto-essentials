@@ -1,20 +1,18 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+
 export function middleware(req: NextRequest) {
-  const token = req.cookies.get("token")?.value;
+  const token = req.cookies.get("business_token")?.value;
 
-  const isAuthPage =
-    req.nextUrl.pathname.startsWith("/login") ||
-    req.nextUrl.pathname.startsWith("/signup");
+  const isProtectedRoute =
+    req.nextUrl.pathname.startsWith("/business/trip-essentials");
 
-  if (!token && !isAuthPage) {
-    return NextResponse.redirect(new URL("/login", req.url));
+  if (isProtectedRoute && !token) {
+    return NextResponse.redirect(
+      new URL("/auth/business-login", req.url)
+    );
   }
 
   return NextResponse.next();
 }
-
-export const config = {
-  matcher: ["/dashboard/:path*", "/profile/:path*"]
-};

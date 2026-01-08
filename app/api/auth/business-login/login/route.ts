@@ -66,15 +66,24 @@ export async function POST(req: Request) {
       { expiresIn: "7d" }
     );
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
-      token,
       business: {
         id: business.id,
         phone_no: business.phone_no,
         email: business.email
       }
     });
+
+    response.cookies.set("business_token", token, {
+      httpOnly: true,
+      path: "/",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7 // 7 days
+    });
+
+    return response;
+
   } catch (err) {
     console.error(err);
     return NextResponse.json(
