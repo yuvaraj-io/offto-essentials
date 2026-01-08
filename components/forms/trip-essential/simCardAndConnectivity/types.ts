@@ -16,3 +16,12 @@ export interface SimServiceFormData {
 
   sim_replace_availability: boolean;
 }
+
+
+export interface SimPlan {
+  id?: string;
+  plan_name: string;
+  sim_name: string;
+  details: string;
+  price: number | "";
+}

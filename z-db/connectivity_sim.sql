@@ -74,3 +74,19 @@ CREATE TABLE sim_services (
 );
 
 
+CREATE TABLE sim_service_plans (
+  id CHAR(36) PRIMARY KEY,
+  sim_service_id CHAR(36) NOT NULL,
+
+  plan_name VARCHAR(255) NOT NULL,
+  sim_name VARCHAR(255),
+  details TEXT,
+  price DECIMAL(10,2) NOT NULL,
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  CONSTRAINT fk_sim_service
+    FOREIGN KEY (sim_service_id)
+    REFERENCES sim_services(id)
+    ON DELETE CASCADE
+);
