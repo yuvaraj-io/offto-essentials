@@ -1,62 +1,33 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { v4 as uuidv4 } from "uuid";
+import { getBusinessFromRequest } from "@/lib/auth/business-auth";
 
-export async function POST(req: Request) {
+export async function GET(req: Request) {
   try {
-    const body = await req.json();
+    const { business_login_id } = getBusinessFromRequest(req);
 
-    const {
-      business_login_id,
-      name,
-      email,
-      phone_number,
-      about,
-      latitude,
-      longitude,
-      address,
-      landmark,
-      pincode,
-      profile_pic
-    } = body;
-
-    if (!business_login_id || !name || !email || !phone_number) {
-      return NextResponse.json(
-        { message: "Missing required fields" },
-        { status: 400 }
-      );
-    }
-
-    const id = uuidv4();
-
-    await db.query(
-      `INSERT INTO connectivity_sim_business_profile (
-        id, business_login_id, name, email, phone_number,
-        about, latitude, longitude, address, landmark, pincode, profile_pic
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        id,
-        business_login_id,
-        name,
-        email,
-        phone_number,
-        about || null,
-        latitude || null,
-        longitude || null,
-        address || null,
-        landmark || null,
-        pincode || null,
-        profile_pic || null
-      ]
+    const [rows] = await db.query(
+      `SELECT * FROM connectivity_sim_business_profile
+       WHERE business_login_id = ?`,
+      [business_login_id]
     );
 
     return NextResponse.json({
       success: true,
-      id,
-      message: "Profile created successfully"
+      data: rows
     });
-  } catch (err) {
+  } catch (err: any) {
+    if (err.message === "NOT_AUTHENTICATED") {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
     console.error(err);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Server error" },
+      { status: 500 }
+    );
   }
 }

@@ -33,14 +33,8 @@ export default function BusinessProfile() {
 
       {/* Content */}
       <div className="px-6 py-8 space-y-6">
-        {/* Operating Hours */}
-        <section>
-          <h3 className="font-medium mb-2">Operating Hours</h3>
-          <div className="flex gap-6 text-sm text-gray-700">
-            <p>Mon - Fri : 9 AM – 6 PM</p>
-            <p>Sat - Sun : 10 AM – 4 PM</p>
-          </div>
-        </section>
+
+       
 
         {/* About */}
         <section>
