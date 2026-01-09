@@ -53,6 +53,12 @@ export default function BusinessChainPage() {
       );
       const subData = await subRes.json();
 
+      await fetch("/api/business/active/set-active", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ business_id: selectedBusiness.id }),
+      });
+
       // 2️⃣ Hydrate context properly
       setActiveBusiness({
         id: selectedBusiness.id,
