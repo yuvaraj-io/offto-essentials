@@ -35,9 +35,37 @@ export default function SimServiceClient({
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [showPlans, setShowPlans] = useState(false);
 
-  const getConsole = () => {
-    console.log(service, plans);
+  const handleCheckout = async () => {
+  if (!selectedPlan || !service) return;
+
+  const res = await fetch(
+    "/api/bookings/trip-essentials/sim-and-connectivity/sim-service/create",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sim_service: service,
+        plan: selectedPlan
+      })
+    }
+  );
+
+  if (res.status === 401) {
+    alert("Please login to continue");
+    return;
   }
+
+  if (!res.ok) {
+    alert("Booking failed");
+    return;
+  }
+
+  const data = await res.json();
+
+  // redirect to my bookings
+  window.location.href = "/my-bookings";
+};
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -118,7 +146,7 @@ export default function SimServiceClient({
             ₹ {selectedPlan?.price ?? plans[0]?.price}
           </p>
 
-          <Button className="w-full" onClick={getConsole} disabled={!selectedPlan}>
+          <Button className="w-full" onClick={handleCheckout} disabled={!selectedPlan}>
             PROCEED TO CHECKOUT
           </Button>
         </div>
