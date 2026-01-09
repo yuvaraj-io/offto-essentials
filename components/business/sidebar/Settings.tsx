@@ -1,6 +1,20 @@
+"use client"
 import React from "react";
 
+
+
 export default function Settings() {
+
+  const handleLogout = async () => {
+  await fetch("/api/auth/logout", { method: "POST" });
+
+  // Optional: clear local storage / context
+  localStorage.clear();
+
+  window.location.href = "/auth/business-login";
+};
+
+
   return (
     <div className="max-w-5xl mx-auto p-10 bg-white">
       {/* Header */}
@@ -40,9 +54,13 @@ export default function Settings() {
           91-xxxxxxx668
         </p>
 
-        <p className="text-red-500 cursor-pointer">
+        <button
+          onClick={handleLogout}
+          className="text-red-600 hover:underline"
+        >
           Logout
-        </p>
+        </button>
+
       </div>
     </div>
   );

@@ -1,62 +1,146 @@
-import React from "react";
+"use client";
 
-export default function BankDetails() {
+import { useEffect, useState } from "react";
+import { useBusiness } from "@/context/BusinessContext";
+import { Button } from "@/components/ui/button";
+
+export default function BankDetailsPage() {
+  const { activeBusiness } = useBusiness();
+
+  const [form, setForm] = useState({
+    bank_account_number: "",
+    bank_account_name: "",
+    bank_account_type: "",
+    bank_name: "",
+    branch_name: ""
+  });
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  /* ---------- FETCH ---------- */
+  useEffect(() => {
+    if (!activeBusiness) return;
+
+    const fetchData = async () => {
+      const res = await fetch(
+        `/api/business/bank-details/get?business_profile_id=${activeBusiness.id}`
+      );
+      const data = await res.json();
+
+      if (data.data) {
+        setForm({
+          bank_account_number: data.data.bank_account_number,
+          bank_account_name: data.data.bank_account_name,
+          bank_account_type: data.data.bank_account_type,
+          bank_name: data.data.bank_name,
+          branch_name: data.data.branch_name
+        });
+      }
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [activeBusiness]);
+
+  const update = (key: string, value: string) => {
+    setForm((p) => ({ ...p, [key]: value }));
+    setError("");
+  };
+
+  const handleSave = async () => {
+    if (Object.values(form).some((v) => !v.trim())) {
+      setError("All fields are required");
+      return;
+    }
+
+    setSaving(true);
+
+    const res = await fetch(
+      "/api/business/bank-details/save",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          business_profile_id: activeBusiness?.id
+        })
+      }
+    );
+
+    setSaving(false);
+
+    if (!res.ok) {
+      setError("Failed to save bank details");
+      return;
+    }
+
+    alert("Bank details saved successfully");
+  };
+
+  if (loading) return <p className="p-6">Loading...</p>;
+
   return (
-    <div className="max-w-6xl mx-auto p-10 bg-white">
-      <div className="flex justify-between items-start">
-        {/* Left Form */}
-        <div className="flex-1 max-w-2xl">
-          <div className="space-y-6">
-            {/* Account Number */}
-            <input
-              type="text"
-              placeholder="Bank account number"
-              className="w-full border rounded-full px-5 py-3 text-sm"
-            />
+    <div className="max-w-5xl mx-auto p-6 space-y-8 bg-white">
+      <h1 className="text-xl font-bold">Bank Details</h1>
 
-            {/* Row 1 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <input
-                type="text"
-                placeholder="Bank account name"
-                className="border rounded-full px-5 py-3 text-sm"
-              />
-              <input
-                type="text"
-                placeholder="Bank account type"
-                className="border rounded-full px-5 py-3 text-sm"
-              />
-            </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <input
+          placeholder="Bank account number"
+          className="border rounded px-4 py-2"
+          value={form.bank_account_number}
+          onChange={(e) =>
+            update("bank_account_number", e.target.value)
+          }
+        />
 
-            {/* Row 2 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <input
-                type="text"
-                placeholder="Branch name"
-                className="border rounded-full px-5 py-3 text-sm"
-              />
-              <input
-                type="text"
-                placeholder="Bank Name"
-                className="border rounded-full px-5 py-3 text-sm"
-              />
-            </div>
-          </div>
+        <input
+          placeholder="Bank account name"
+          className="border rounded px-4 py-2"
+          value={form.bank_account_name}
+          onChange={(e) =>
+            update("bank_account_name", e.target.value)
+          }
+        />
 
-          {/* Save Button */}
-          <div className="mt-16">
-            <button className="border px-10 py-2 rounded-md hover:bg-gray-50">
-              Save changes
-            </button>
-          </div>
-        </div>
+        <input
+          placeholder="Bank account type"
+          className="border rounded px-4 py-2"
+          value={form.bank_account_type}
+          onChange={(e) =>
+            update("bank_account_type", e.target.value)
+          }
+        />
 
-        {/* Illustration */}
-        <div className="hidden md:flex flex-1 justify-center">
-          <div className="w-64 h-64 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
-            Illustration
-          </div>
-        </div>
+        <input
+          placeholder="Bank name"
+          className="border rounded px-4 py-2"
+          value={form.bank_name}
+          onChange={(e) =>
+            update("bank_name", e.target.value)
+          }
+        />
+
+        <input
+          placeholder="Branch name"
+          className="border rounded px-4 py-2"
+          value={form.branch_name}
+          onChange={(e) =>
+            update("branch_name", e.target.value)
+          }
+        />
+      </div>
+
+      {error && (
+        <p className="text-sm text-red-500">{error}</p>
+      )}
+
+      <div className="flex justify-center">
+        <Button disabled={saving} onClick={handleSave}>
+          {saving ? "Saving..." : "Save changes"}
+        </Button>
       </div>
     </div>
   );
