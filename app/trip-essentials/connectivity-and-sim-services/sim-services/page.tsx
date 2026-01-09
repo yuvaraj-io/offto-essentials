@@ -182,7 +182,7 @@ export default function LocalSimPage() {
               <button
                 onClick={() =>
                     router.push(
-                    `/trip-essentials/connectivity-and-sim-services/sim-services/${item.sim_service_id}`
+                    `/trip-essentials/connectivity-and-sim-services/sim-services/details/${item.sim_service_id}`
                     )
                 }
                 className="bg-green-500 text-white px-6 py-2 rounded"

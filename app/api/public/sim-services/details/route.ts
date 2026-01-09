@@ -4,13 +4,17 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 
-export async function GET(
-  _req: Request,
-  context: { params: Promise<{ simServiceId: string }> }
-) {
+export async function GET(req: Request) {
   try {
-    // ✅ IMPORTANT FIX
-    const { simServiceId } = await context.params;
+    const { searchParams } = new URL(req.url);
+    const simServiceId = searchParams.get("simServiceId");
+
+    if (!simServiceId) {
+      return NextResponse.json(
+        { message: "simServiceId is required" },
+        { status: 400 }
+      );
+    }
 
     /* ---------- SIM SERVICE + BUSINESS ---------- */
     const [serviceRows] = await db.query<RowDataPacket[]>(
@@ -57,7 +61,7 @@ export async function GET(
         sim_name,
         details,
         price
-      FROM tsim_service_plans
+      FROM sim_service_plans
       WHERE sim_service_id = ?
       ORDER BY price ASC
       `,
@@ -70,10 +74,11 @@ export async function GET(
       plans: planRows
     });
   } catch (err) {
-    console.error("[SIM_SERVICE_BY_ID]", err);
+    console.error("[SIM_SERVICE_DETAILS]", err);
     return NextResponse.json(
       { message: "Server error" },
       { status: 500 }
     );
   }
 }
+
