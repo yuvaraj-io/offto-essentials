@@ -2,8 +2,45 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+
+
+interface User {
+  phone: string;
+}
+
 
 export default function Header() {
+
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMe = async () => {
+      try {
+        const res = await fetch("/api/auth/users-login/me");
+        const data = await res.json();
+
+        if (data.loggedIn) {
+          setUser({ phone: data.user?.phone_no });
+        }
+      } catch (err) {
+        console.error("Auth check failed", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMe();
+  }, []);
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    window.location.reload();
+  };
+
+
   return (
     <header id="header" className="sticky top-0 z-50 bg-white border-b">
       {/* Top Branding */}
@@ -142,20 +179,34 @@ export default function Header() {
       </div>
 
       {/* Login */}
-      <div className="container mx-auto px-4">
-        <div className="flex justify-end py-2">
-          <button
-            className="flex items-center gap-2"
-            onClick={() => {
-              // open login modal
-              console.log('Open Login Modal');
-            }}
-          >
-            <i className="bi bi-person-circle text-2xl"></i>
-            <span>Login / Signup</span>
-          </button>
-        </div>
-      </div>
+       {/* RIGHT SIDE */}
+        {!loading && (
+          <div className="flex items-center gap-4 text-sm">
+            {!user ? (
+              <>
+                <Link href="/login">
+                  <Button variant="outline">Login</Button>
+                </Link>
+                <Link href="/signup">
+                  <Button>Sign up</Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <span className="text-gray-700">
+                  📱 {user.phone}
+                </span>
+
+                <Button
+                  variant="outline"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Button>
+              </>
+            )}
+          </div>
+        )}
     </header>
   );
 }

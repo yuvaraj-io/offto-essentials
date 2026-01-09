@@ -35,6 +35,10 @@ export default function SimServiceClient({
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [showPlans, setShowPlans] = useState(false);
 
+  const getConsole = () => {
+    console.log(service, plans);
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       const res = await fetch(
@@ -114,7 +118,7 @@ export default function SimServiceClient({
             ₹ {selectedPlan?.price ?? plans[0]?.price}
           </p>
 
-          <Button className="w-full" disabled={!selectedPlan}>
+          <Button className="w-full" onClick={getConsole} disabled={!selectedPlan}>
             PROCEED TO CHECKOUT
           </Button>
         </div>
