@@ -42,7 +42,6 @@ export function BusinessProvider({
       try {
         const res = await fetch("/api/business/active");
         const data = await res.json();
-        debugger
         setActiveBusiness(data.activeBusiness ?? null);
       } catch (err) {
         console.error("[BusinessContext] hydrate failed", err);
