@@ -5,18 +5,13 @@ export default function TripEssential(){
      <>
         <section className="px-10 py-12 font-lato">
 
-            <div className="mb-10">
-                <h2 className="text-lg font-semibold">Our services</h2>
-                <div className="mt-2 h-[2px] w-24 bg-blue-600"></div>
-            </div>
-
             <div className="grid grid-cols-2 gap-y-12 gap-x-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
                 
-                <Link href="/trip-essentials/travel-insurance">
+                <Link href="/trip-essentials/connectivity-and-sim-services">
                         <div className="flex flex-col items-center text-center">
                             <img src="/icons/travel-insurance.png" className="h-14 w-14" />
                             <p className="mt-3 w-32 text-sm text-gray-600">
-                                Travel Insurance
+                                Connectivity & SIM Services
                             </p>
                         </div>
                 </Link>
@@ -76,7 +71,7 @@ export default function TripEssential(){
                 <div className="flex flex-col items-center text-center">
                 <img src="/icons/sim.png" className="h-14 w-14" />
                 <p className="mt-3 w-32 text-sm text-gray-600">
-                    Connectivity & SIM Services
+                    Travel Insurance
                 </p>
                 </div>
 
