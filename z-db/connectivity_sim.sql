@@ -31,6 +31,10 @@ CREATE TABLE connectivity_sim_business_profile (
 
 
 
+
+
+
+
 CREATE TABLE subscriptions (
   id CHAR(36) PRIMARY KEY,
   business_profile_id CHAR(36) NOT NULL,
@@ -89,4 +93,44 @@ CREATE TABLE sim_service_plans (
     FOREIGN KEY (sim_service_id)
     REFERENCES sim_services(id)
     ON DELETE CASCADE
+);
+
+
+
+CREATE TABLE business_bank_details (
+  id CHAR(36) PRIMARY KEY,
+
+  business_profile_id CHAR(36) NOT NULL,
+
+  bank_account_number VARCHAR(50) NOT NULL,
+  bank_account_name VARCHAR(255) NOT NULL,
+  bank_account_type VARCHAR(50) NOT NULL,
+  bank_name VARCHAR(255) NOT NULL,
+  branch_name VARCHAR(255) NOT NULL,
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  UNIQUE KEY uniq_business_bank (business_profile_id),
+
+  CONSTRAINT fk_bank_business
+    FOREIGN KEY (business_profile_id)
+    REFERENCES connectivity_sim_business_profile(id)
+    ON DELETE CASCADE
+);
+
+
+CREATE TABLE business_contact_details (
+  id CHAR(36) PRIMARY KEY,
+
+  business_profile_id CHAR(36) NOT NULL UNIQUE,
+
+  phone_number VARCHAR(20) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ON UPDATE CURRENT_TIMESTAMP,
+
+  INDEX idx_business_contact (business_profile_id)
 );
