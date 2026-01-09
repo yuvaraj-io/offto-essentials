@@ -1,128 +1,139 @@
-import React from "react";
+"use client";
 
-const YEAR = 2026;
-
-const months = [
-  "January", "February", "March", "April",
-  "May", "June", "July", "August",
-  "September", "October", "November", "December"
-];
+import { useEffect, useState } from "react";
+import MonthCalendar from "./calandar-management/MonthCalendar";
+import { formatDate, getMonthDays } from "./calandar-management/calendar-utils";
+import { useBusiness } from "@/context/BusinessContext";
 
 export default function CalendarManagement() {
+  const { activeBusiness } = useBusiness();
+  const businessId = activeBusiness?.id;
+
+  const [unavailable, setUnavailable] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
+
+  const today = new Date();
+  const months = Array.from({ length: 12 }).map((_, i) => {
+    const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
+    return { year: d.getFullYear(), month: d.getMonth() };
+  });
+
+  /* ---------- LOAD ---------- */
+  useEffect(() => {
+    if (!businessId) return;
+
+    const from = formatDate(months[0] && new Date(months[0].year, months[0].month, 1));
+    const last = months[months.length - 1];
+    const to = formatDate(new Date(last.year, last.month + 1, 0));
+
+    fetch(
+      `/api/business/unavailability/list?business_profile_id=${businessId}&from=${from}&to=${to}`
+    )
+      .then((r) => r.json())
+      .then((res) => {
+        const set = new Set<string>();
+
+        res.data.forEach((row: any) => {
+          let d = new Date(row.from_date);
+          const end = new Date(row.to_date);
+
+          while (d <= end) {
+            set.add(formatDate(d));
+            d.setDate(d.getDate() + 1);
+          }
+        });
+
+        setUnavailable(set);
+      })
+      .finally(() => setLoading(false));
+  }, [businessId]);
+
+  /* ---------- DATE CLICK ---------- */
+  const toggleDate = async (date: string) => {
+    const isBlocked = unavailable.has(date);
+
+    setUnavailable((prev) => {
+      const copy = new Set(prev);
+      isBlocked ? copy.delete(date) : copy.add(date);
+      return copy;
+    });
+
+    await fetch(
+      `/api/business/unavailability/${isBlocked ? "delete" : "create"}`,
+      {
+        method: isBlocked ? "DELETE" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          business_profile_id: businessId,
+          from_date: date,
+          to_date: date,
+          date
+        })
+      }
+    );
+  };
+
+  /* ---------- MONTH TOGGLE ---------- */
+  const toggleMonth = async (
+  year: number,
+  month: number,
+  block: boolean
+) => {
+  const { days } = getMonthDays(year, month);
+
+  // 🔥 Optimistic UI update
+  setUnavailable((prev) => {
+    const copy = new Set(prev);
+
+    days.forEach((d) => {
+      const key = formatDate(d);
+      block ? copy.add(key) : copy.delete(key);
+    });
+
+    return copy;
+  });
+
+  // 🔁 Sync with backend
+  await fetch(
+    `/api/business/unavailability/${block ? "block-month" : "unblock-month"}`,
+    {
+      method: block ? "POST" : "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        business_profile_id: businessId,
+        year,
+        month: month + 1
+      })
+    }
+  );
+};
+
+
+  if (loading) return <p className="p-6">Loading calendar...</p>;
+
   return (
-    <div className="max-w-7xl mx-auto p-10 bg-white">
-      {/* Header */}
-      <div className="flex justify-between items-start mb-10">
-        <div>
-          <div className="flex items-center gap-4 mb-3">
-            <h2 className="text-xl font-medium">Calendar</h2>
-            <span className="bg-primary text-white px-4 py-1 rounded">
-              Management
-            </span>
-          </div>
-          <p className="text-gray-500 text-sm">
-            Get the full control on price & details of your booking
-          </p>
-
-          {/* Date Search */}
-          <div className="flex items-center gap-3 mt-6">
-            <label className="text-sm">Date-</label>
-            <input
-              placeholder="dd/mm/yyyy"
-              className="border px-3 py-2 rounded w-44 text-sm"
-            />
-            <span className="text-blue-600 cursor-pointer">🔍</span>
-          </div>
-        </div>
-
-        {/* Illustration */}
-        <div className="hidden md:flex">
-          <div className="w-56 h-56 bg-gray-100 rounded-full flex items-center justify-center text-gray-400">
-            Illustration
-          </div>
-        </div>
+    <div className="p-6 space-y-10">
+      <div>
+        <h1 className="text-xl font-bold">Calendar Management</h1>
+        <p className="text-sm text-gray-600">
+          Manage business availability
+        </p>
       </div>
 
-      {/* Calendar Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-        {months.map((month, index) => (
-          <MonthCard key={month} month={month} monthIndex={index} />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {months.map(({ year, month }) => (
+          <MonthCalendar
+            key={`${year}-${month}`}
+            year={year}
+            month={month}
+            unavailableDates={unavailable}
+            onDateClick={toggleDate}
+            onToggleMonth={(blocked) =>
+              toggleMonth(year, month, blocked)
+            }
+          />
         ))}
       </div>
-    </div>
-  );
-}
-
-/* ---------------- Month Card ---------------- */
-
-function MonthCard({
-  month,
-  monthIndex,
-}: {
-  month: string;
-  monthIndex: number;
-}) {
-  const firstDay = new Date(YEAR, monthIndex, 1).getDay(); // 0 = Sun
-  const daysInMonth = new Date(YEAR, monthIndex + 1, 0).getDate();
-
-  // Convert Sunday-based index to Monday-based grid
-  const startOffset = firstDay === 0 ? 6 : firstDay - 1;
-
-  const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
-
-  return (
-    <div className="text-center">
-      {/* Live Toggle */}
-      <div className="flex justify-center items-center gap-2 mb-3">
-        <Toggle />
-        <span className="text-xs text-red-500">Live</span>
-      </div>
-
-      {/* Month Label */}
-      <div className="bg-primary text-white rounded-full py-2 mb-4">
-        {month} {YEAR}
-      </div>
-
-      {/* Week Days */}
-      <div className="grid grid-cols-7 text-xs text-gray-400 mb-2">
-        {["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map((d) => (
-          <div key={d}>{d}</div>
-        ))}
-      </div>
-
-      {/* Dates */}
-      <div className="grid grid-cols-7 gap-y-2 text-sm">
-        {Array.from({ length: totalCells }).map((_, i) => {
-          const day = i - startOffset + 1;
-          const isValidDay = day > 0 && day <= daysInMonth;
-
-          return (
-            <div
-              key={i}
-              className={`h-7 w-7 mx-auto flex items-center justify-center rounded-full
-                ${
-                  day === 15
-                    ? "bg-blue-600 text-white"
-                    : isValidDay
-                    ? "text-gray-700"
-                    : "text-transparent"
-                }`}
-            >
-              {isValidDay ? day : ""}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-/* ---------------- Toggle ---------------- */
-
-function Toggle() {
-  return (
-    <div className="w-10 h-5 bg-blue-500 rounded-full relative">
-      <div className="absolute top-0.5 left-0.5 h-4 w-4 bg-white rounded-full" />
     </div>
   );
 }
