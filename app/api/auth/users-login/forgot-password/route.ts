@@ -1,40 +1,20 @@
 import { NextResponse } from "next/server";
-import bcrypt from "bcrypt";
+import { v4 as uuidv4 } from "uuid";
 import { db } from "@/lib/db";
 
-interface ForgotPasswordRequest {
-  phone_no: string;
-  new_password: string;
-}
-
 export async function POST(req: Request) {
-  try {
-    const { phone_no, new_password }: ForgotPasswordRequest = await req.json();
+  const { phone_no } = await req.json();
+  const token = uuidv4();
 
-    if (!phone_no || !new_password) {
-      return NextResponse.json({ message: "Missing fields" }, { status: 400 });
-    }
+  await db.query(
+    `INSERT INTO user_password_resets
+     (id, phone_no, token, expires_at)
+     VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL 1 HOUR))`,
+    [uuidv4(), phone_no, token]
+  );
 
-    const passwordHash = await bcrypt.hash(new_password, 10);
+  // TODO: send SMS
+  console.log("Reset token:", token);
 
-    const [result]: any = await db.query(
-      "UPDATE users_login SET password_hash = ? WHERE phone_no = ?",
-      [passwordHash, phone_no]
-    );
-
-    if (result.affectedRows === 0) {
-      return NextResponse.json(
-        { message: "User not found" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: "Password updated successfully"
-    });
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
-  }
+  return NextResponse.json({ success: true });
 }
