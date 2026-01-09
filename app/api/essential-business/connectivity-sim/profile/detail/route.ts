@@ -31,11 +31,7 @@ export async function GET(req: Request) {
     const [rows] = await db.query<BusinessProfileRow[]>(
       `
       SELECT
-        id,
-        name,
-        address,
-        phone_number,
-        email
+        *
       FROM connectivity_sim_business_profile
       WHERE id = ?
         AND business_login_id = ?

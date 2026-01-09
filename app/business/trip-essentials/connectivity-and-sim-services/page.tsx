@@ -61,7 +61,6 @@ export default function ConnectivitySimPage() {
           `/api/subscriptions/get/${businessId}`
         );
         const subData = await subRes.json();
-        debugger
         // 4️⃣ Sync context ONLY if business exists
         setActiveBusiness({
           id: fullBusiness.id,

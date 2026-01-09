@@ -15,7 +15,7 @@ export default function RootLayout({
   return (
     <>
       <div className="w-full  bg-white">
-        <div className="mx-auto max-w-7xl items-center justify-between px-6">
+        <div className="">
           {children}
         </div>
         </div>

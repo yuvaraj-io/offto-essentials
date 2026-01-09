@@ -8,6 +8,8 @@ export default function BusinessProfileLayout({
 }) {
   return <BusinessProvider>
     <Header />
-    {children}
+    <div className="mx-auto max-w-7xl items-center justify-between px-6">
+      {children}
+    </div>
     </BusinessProvider>;
 }
