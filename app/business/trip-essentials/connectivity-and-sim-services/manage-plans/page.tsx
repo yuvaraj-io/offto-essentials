@@ -74,7 +74,7 @@ export default function ManagePlansPage() {
         <Button
           onClick={() =>
             router.push(
-              "/business/trip-essentials/connectivity-and-sim-services/create"
+              "/business/trip-essentials/connectivity-and-sim-services/add-plans"
             )
           }
         >
