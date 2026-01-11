@@ -36,7 +36,8 @@ export default function Header() {
   }, []);
 
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
+    await fetch("/api/auth/users-login/logout", { method: "POST" });
+
     window.location.reload();
   };
 
